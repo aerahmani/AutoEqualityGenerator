@@ -12,7 +12,7 @@ using System.Text;
 namespace Generators
 {
     [Generator]
-    public class AutoEqualityGenerator : IIncrementalGenerator
+    public sealed class AutoEqualityGenerator : IIncrementalGenerator
     {
         private const string attributeText = @"
 using System;

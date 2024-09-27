@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35303.130
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoEqualityGenerator", "AutoEqualityGenerator\AutoEqualityGenerator.csproj", "{D2B04239-5175-4C7F-ADA5-11E977D1876E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoEqualityGeneratorLib", "AutoEqualityGeneratorLib\AutoEqualityGeneratorLib.csproj", "{3D955BC4-8459-4F72-B997-4AFC279A0CD7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoEqualityGeneratorLib.Test", "AutoEqualityGeneratorLib.Test\AutoEqualityGeneratorLib.Test.csproj", "{4938C5D6-BBAC-45FD-BFA5-3CF587C21E95}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{BD8E516D-AAE7-41F5-9F17-03A9EF42B3A8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9E33732F-BF32-4459-83B7-83345F678156}"
+	ProjectSection(SolutionItems) = preProject
+		.lutignore = .lutignore
+		AutoEqualityGenerator.lutconfig = AutoEqualityGenerator.lutconfig
+		.github\workflows\build.yml = .github\workflows\build.yml
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A1B24226-8803-4427-BB65-EFCFDDBCD551}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D2B04239-5175-4C7F-ADA5-11E977D1876E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2B04239-5175-4C7F-ADA5-11E977D1876E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2B04239-5175-4C7F-ADA5-11E977D1876E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2B04239-5175-4C7F-ADA5-11E977D1876E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D955BC4-8459-4F72-B997-4AFC279A0CD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D955BC4-8459-4F72-B997-4AFC279A0CD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D955BC4-8459-4F72-B997-4AFC279A0CD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D955BC4-8459-4F72-B997-4AFC279A0CD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4938C5D6-BBAC-45FD-BFA5-3CF587C21E95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4938C5D6-BBAC-45FD-BFA5-3CF587C21E95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4938C5D6-BBAC-45FD-BFA5-3CF587C21E95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4938C5D6-BBAC-45FD-BFA5-3CF587C21E95}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4938C5D6-BBAC-45FD-BFA5-3CF587C21E95} = {A1B24226-8803-4427-BB65-EFCFDDBCD551}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6BB96165-14C0-4175-B3AF-1C4F8ACF7053}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Shared\Shared.projitems*{3d955bc4-8459-4f72-b997-4afc279a0cd7}*SharedItemsImports = 5
+		Shared\Shared.projitems*{bd8e516d-aae7-41f5-9f17-03a9ef42b3a8}*SharedItemsImports = 13
+	EndGlobalSection
+EndGlobal

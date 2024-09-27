@@ -43,6 +43,21 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"aerahmani_AutoEqualityGenerator" /o:"aerahmani" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.skipJreProvisioning=true
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"aerahmani_AutoEqualityGenerator" /o:"aerahmani" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.skipJreProvisioning=true /d:sonar.scanner.scanAll=false
           dotnet build
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      - name: Install dotnet-coverage
+        shell: powershell
+        run: |
+          New-Item -Path .\.sonar\dotnetcoverage -ItemType Directory
+          dotnet tool install dotnet-coverage --tool-path .\.sonar\dotnetcoverage
+      - name: Test and coverage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: |
+          .\.sonar\scanner\dotnetcoverage\dotnet-coverage begin /k:"aerahmani_AutoEqualityGenerator" /d:"sonar.verbose=true" /o:"aerahmani" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.skipJreProvisioning=true /d:sonar.scanner.scanAll=false
+            dotnet build --no-incremental
+            dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
+          .\.sonar\scanner\dotnetcoverage\dotnet-coverage end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"

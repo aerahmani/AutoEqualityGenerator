@@ -1,0 +1,29 @@
+﻿
+using System;
+using System.Collections.Generic;
+
+
+#nullable enable
+partial class CaseInsensitivePerson : IEquatable<CaseInsensitivePerson>
+{
+    public override bool Equals(object obj) => obj is CaseInsensitivePerson other && Equals(other);
+    public static bool operator==(CaseInsensitivePerson? left, CaseInsensitivePerson? right) => left is object && left.Equals(right);
+    public static bool operator!=(CaseInsensitivePerson? left, CaseInsensitivePerson? right) => !(left == right);
+
+    public bool Equals(CaseInsensitivePerson? other)
+    {
+        return
+            other is object &&
+            string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase) &&
+            Age == other.Age;
+    }
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(Name?.ToUpperInvariant());
+        hash.Add(Age);
+        return hash.ToHashCode();
+    }
+}
+#nullable disable

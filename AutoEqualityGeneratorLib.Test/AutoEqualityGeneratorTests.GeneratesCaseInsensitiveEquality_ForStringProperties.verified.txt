@@ -21,7 +21,7 @@ partial class CaseInsensitivePerson : IEquatable<CaseInsensitivePerson>
     public override int GetHashCode()
     {
         var hash = new HashCode();
-        hash.Add(Name);
+        hash.Add(Name?.ToUpperInvariant());
         hash.Add(Age);
         return hash.ToHashCode();
     }

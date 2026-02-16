@@ -1,12 +1,10 @@
-﻿using Microsoft.CodeAnalysis;
+﻿    using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace Generators
@@ -72,7 +70,7 @@ internal sealed class AutoEqualityAttribute : Attribute
                 foreach (var attribute in attributeList.Attributes)
                 {
                     if (context.SemanticModel.GetSymbolInfo(attribute).Symbol is IMethodSymbol attributeSymbol &&
-                        attributeSymbol.ContainingType.ToDisplayString() == "AutoEqualityAttribute")
+                        attributeSymbol.ContainingType?.Name == "AutoEqualityAttribute")
                     {
                         return typeDeclarationSyntax;
                     }
@@ -88,44 +86,33 @@ internal sealed class AutoEqualityAttribute : Attribute
             if (types.IsDefaultOrEmpty)
                 return;
 
-            var builder = new StringBuilder();
-            var list = new List<(INamedTypeSymbol NamedTypeSymbol, bool IsAnnotated, bool IsCaseInsensitive)>();
+            // Group by SyntaxTree so we only call GetSemanticModel once per tree
+            var groups = types.Distinct().GroupBy(t => t.SyntaxTree);
 
-            foreach (var typeSyntax in types.Distinct())
+            var sb = new StringBuilder();
+
+            foreach (var group in groups)
             {
-                var semanticModel = compilation.GetSemanticModel(typeSyntax.SyntaxTree);
-                INamedTypeSymbol? namedTypeSymbolusage = null;
-                if (semanticModel.GetDeclaredSymbol(typeSyntax) is INamedTypeSymbol namedTypeSymbol)
+                var semanticModel = compilation.GetSemanticModel(group.Key);
+                foreach (var typeSyntax in group)
                 {
-                    namedTypeSymbolusage = namedTypeSymbol;
+                    if (semanticModel.GetDeclaredSymbol(typeSyntax) is not INamedTypeSymbol namedTypeSymbol)
+                        continue;
+
                     var isAnnotated = semanticModel.GetNullableContext(typeSyntax.SpanStart) == NullableContext.Enabled;
 
-                    // Check if the InEquality attribute is marked as "Case Insensitive"
+                    // Check if the AutoEquality attribute is marked as "Case Insensitive"
                     var autoEqualityAttribute = namedTypeSymbol.GetAttributes()
-                        .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == "AutoEqualityAttribute");
+                        .FirstOrDefault(attr => attr.AttributeClass?.Name == "AutoEqualityAttribute");
                     var isCaseInsensitive = autoEqualityAttribute?.NamedArguments
                         .FirstOrDefault(arg => arg.Key == "CaseInsensitive")
                         .Value.Value as bool? ?? false;
 
-                    list.Add((namedTypeSymbol, isAnnotated, isCaseInsensitive));
+                    sb.Clear();
+                    AddTypeGeneration(sb, (namedTypeSymbol, isAnnotated, isCaseInsensitive));
+                    context.AddSource($"{namedTypeSymbol.Name}.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
                 }
             }
-
-            if (list.Any())
-            {
-
-                foreach (var item in list)
-                {
-                    AddTypeGeneration(builder, item);
-                    context.AddSource($"{item.NamedTypeSymbol.Name}.g.cs", SourceText.From(builder.ToString(), Encoding.UTF8));
-                    builder.Clear();
-                }
-                list.Clear();
-            }
-
-
-
-
         }
 
         private void AddTypeGeneration(
@@ -155,7 +142,7 @@ using System.Collections.Generic;");
             }
         }
 
-      
+
 
         private void AddTypeGeneration(
             StringBuilder builder, IndentUtil indent, INamedTypeSymbol typeSymbol,
@@ -201,6 +188,23 @@ using System.Collections.Generic;");
 
                 using var marker = indent.Increase(2);
 
+                // If no members, return quickly: for classes ensure other is object, for structs true
+                if (memberInfoList.Count == 0)
+                {
+                    if (typeSymbol.TypeKind == TypeKind.Class)
+                    {
+                        builder.AppendLine($"{indent.Value}other is object;");
+                    }
+                    else
+                    {
+                        builder.AppendLine($"{indent.Value}true;");
+                    }
+
+                    marker.Revert();
+                    builder.AppendLine($"{indent.Value}}}");
+                    return;
+                }
+
                 if (typeSymbol.TypeKind == TypeKind.Class)
                 {
                     builder.AppendLine($"{indent.Value}other is object &&");
@@ -240,7 +244,16 @@ using System.Collections.Generic;");
                 for (var i = 0; i < memberInfoList.Count; i++)
                 {
                     var current = memberInfoList[i];
-                    builder.AppendLine($"{indent.Value2}hash.Add({current.Name});");
+
+                    // If case-insensitive string comparison is requested, normalize the string for hash stability.
+                    if (current.IsString && isCaseInsensitive)
+                    {
+                        builder.AppendLine($"{indent.Value2}hash.Add({current.Name}?.ToUpperInvariant());");
+                    }
+                    else
+                    {
+                        builder.AppendLine($"{indent.Value2}hash.Add({current.Name});");
+                    }
                 }
 
                 builder.AppendLine($"{indent.Value2}return hash.ToHashCode();");
